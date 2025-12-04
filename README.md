@@ -6,36 +6,84 @@
 ![Network](https://img.shields.io/badge/network-Avalanche%20Fuji-red)
 ![Status](https://img.shields.io/badge/status-Beta-orange)
 
-**Autonomous Treasury Guardian** is a decentralized, AI-powered treasury management system designed for DAOs and organizations on Avalanche. It combines on-chain transparency with off-chain AI intelligence to automate risk management, asset rebalancing, and operational payments.
+**Autonomous Treasury Guardian** is a decentralized, AI-powered treasury management system designed for DAOs and organizations on Avalanche. By bridging on-chain transparency with off-chain AI intelligence, ATG automates risk management, asset rebalancing, and operational payments, ensuring treasury health and sustainability without constant human intervention.
 
 ## 🌟 Core Features
 
 ### 🤖 AI-Driven Autonomy
-- **Risk Engine**: Continuous monitoring of market volatility (via CoinGecko) and vault health.
-- **Automated Proposals**: The AI agent automatically proposes rebalances (AVAX/USDC) when risk thresholds are breached or portfolio allocation drifts.
-- **Agent API**: Integrated Next.js API routes (`/api/agent/*`) for risk evaluation and on-chain action triggering.
-- **Intelligent Execution**: Server-side signer (Viem) automatically submits proposals to the `ActionExecutor` contract.
+- **Risk Engine**: Continuous, real-time monitoring of market volatility (via CoinGecko) and vault health.
+- **Automated Proposals**: The AI agent proactively proposes rebalances (e.g., AVAX/USDC swaps) when risk thresholds are breached or portfolio allocation drifts.
+- **Agent API**: Dedicated Next.js API routes (`/api/agent/*`) for on-demand risk evaluation and on-chain action triggering.
+- **Intelligent Execution**: Secure server-side signer (Viem) automatically submits proposals to the `ActionExecutor` contract.
 
 ### 🛡️ Advanced Governance
 - **Role-Based Access Control**: Granular permissions via `PermissionManager` (Governance, Executor, Agent roles).
-- **On-Chain Risk Parameters**: Adjustable thresholds for max rebalance size, volatility limits, and runway requirements.
-- **Guardian Controls**: System pause/unpause and role revocation capabilities.
+- **On-Chain Risk Parameters**: Immutable yet adjustable thresholds for max rebalance size, volatility limits, and runway requirements.
+- **Guardian Controls**: Emergency system pause/unpause and instant role revocation capabilities.
 
 ### 🏛️ Treasury Dashboard
-- **Real-Time Monitoring**: Live feed of treasury balances (AVAX, USDC) and asset allocation.
-- **Activity Feed**: Immutable log of all agent proposals, executed actions, and system telemetry.
-- **Interactive Settings**: UI for managing risk configurations and assigning system roles.
+- **Real-Time Monitoring**: Live visualization of treasury balances (AVAX, USDC) and asset allocation.
+- **Activity Feed**: Immutable, transparent log of all agent proposals, executed actions, and system telemetry.
+- **Interactive Settings**: Intuitive UI for managing risk configurations and assigning system roles.
 
 ## 🏗️ System Architecture
 
-The system consists of three layers:
+The system consists of three integrated layers: Smart Contracts, the AI Agent Layer, and the User Frontend.
+
+### Architecture Diagram
+
+```mermaid
+flowchart TD
+    UI[Next.js Frontend\nDashboard / Settings] --> API[Next.js API Routes\n/agent/check-risk\n/agent/propose\n/agent/status]
+    API --> Orchestrator[Orchestrator\nrunAgentCycle()]
+    Orchestrator --> MarketData[Market Data Engine\n(CoinGecko + Volatility)]
+    Orchestrator --> RiskEngine[Risk Engine\n(On-chain params + Balances)]
+    Orchestrator --> ProposalEngine[Proposal Engine\n(Rebalance / Funding / Alerts)]
+    ProposalEngine --> Executor[Agent Wallet Executor\n(Viem + PK)]
+    Executor --> ActionExecutor[Smart Contract: ActionExecutor]
+    RiskEngine --> RiskParameters[Smart Contract: RiskParameters]
+    UI --> TreasuryVault[TreasuryVault\nBalances & Events]
+    TreasuryVault --> UI
+    ActionExecutor --> UI
+```
+
+### AI Workflow Sequence
+
+```mermaid
+sequenceDiagram
+    participant User as User (Dashboard)
+    participant UI as Frontend (Next.js)
+    participant API as API Routes
+    participant Agent as ATG Orchestrator
+    participant Market as Market Data Engine
+    participant Risk as Risk Engine
+    participant Proposal as Proposal Engine
+    participant Exec as Agent Executor
+    participant Chain as Avalanche Smart Contracts
+
+    User->>UI: Clicks "Run AI Analysis"
+    UI->>API: POST /agent/propose
+    API->>Agent: runAgentCycle()
+    Agent->>Market: Fetch live prices & volatility
+    Market-->>Agent: PriceFeed + Volatility
+    Agent->>Risk: Evaluate balances + on-chain params
+    Risk-->>Agent: RiskScore (Low/Med/High/Critical)
+    Agent->>Proposal: Generate action proposal
+    Proposal-->>Agent: Proposal Struct
+    Agent->>Exec: Submit proposal transaction
+    Exec->>Chain: executeAction()
+    Chain-->>API: Tx Receipt + Events
+    API-->>UI: Updated Status + Logs
+```
+
+### Component Breakdown
 
 1.  **Smart Contracts (Avalanche)**:
-    *   `TreasuryVault`: Holds assets and enforces withdrawal logic.
-    *   `ActionExecutor`: Gateway for executing authorized actions (swaps, payments).
-    *   `RiskParameters`: Stores on-chain risk rules.
-    *   `PermissionManager`: Manages access control.
-    *   `AgentAuth`: Authenticates AI agents.
+    *   `TreasuryVault`: Securely holds assets and enforces withdrawal logic.
+    *   `ActionExecutor`: The gateway for executing authorized actions (swaps, payments).
+    *   `RiskParameters`: Stores on-chain risk rules and thresholds.
+    *   `PermissionManager`: Manages access control and role assignments.
+    *   `AgentAuth`: Authenticates AI agents for on-chain interaction.
 
 2.  **AI Agent Layer (Next.js API)**:
     *   **Orchestrator**: Coordinates the full agent cycle (Market Data -> Risk Engine -> Proposal Engine -> Execution).
@@ -43,7 +91,7 @@ The system consists of three layers:
     *   **Wallet**: Server-side signer that submits proposals directly to the blockchain.
 
 3.  **Frontend (Next.js)**:
-    *   User interface for human oversight, approval, and configuration.
+    *   A modern user interface for human oversight, approval, configuration, and monitoring.
 
 ## 🚀 Deployed Contracts (Avalanche Fuji)
 
