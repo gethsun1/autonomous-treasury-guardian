@@ -3,25 +3,32 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-bg: #0B1226;
+  --color-card: rgba(25,34,52,0.6);
+  --color-text: #F6F9FC;
+  --color-accent: #00E0C7;
+  --color-accent-2: #4EE1FF;
+  --color-warning: #FFC857;
+  --color-success: #2EE6A5;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  body {
+    @apply bg-midnight-indigo text-frost-white;
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+@layer components {
+  .glass-card {
+    @apply bg-glass-gray/60 backdrop-blur-xl border border-white/10 rounded-xl;
+  }
+  .glass-card-hover {
+    @apply hover:border-electric-teal/50 transition-all duration-300;
+  }
+  .btn-primary {
+    @apply bg-electric-teal text-midnight-indigo font-bold py-2 px-6 rounded-full hover:bg-photon-cyan transition-colors shadow-lg shadow-electric-teal/20;
+  }
+  .btn-secondary {
+    @apply bg-glass-gray border border-electric-teal/30 text-electric-teal font-bold py-2 px-6 rounded-full hover:bg-electric-teal/10 transition-colors;
   }
 }
