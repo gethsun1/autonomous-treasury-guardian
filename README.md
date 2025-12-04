@@ -1,6 +1,6 @@
 # Autonomous Treasury Guardian (ATG)
 
-![Autonomous Treasury Guardian](/public/atg.png)
+![Autonomous Treasury Guardian](public/atg.png)
 
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Network](https://img.shields.io/badge/network-Avalanche%20Fuji-red)

@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server';
-import { evaluateRisk } from '@/lib/riskEngine';
+import { runRiskCheck } from '@/lib/agent/orchestrator';
+
+export const dynamic = 'force-dynamic'; // Ensure no caching
 
 export async function POST() {
   try {
-    const analysis = await evaluateRisk();
-    return NextResponse.json(analysis);
+    const result = await runRiskCheck();
+    return NextResponse.json(result);
   } catch (error) {
     console.error("Agent Risk Check Failed:", error);
     return NextResponse.json(
@@ -14,3 +16,6 @@ export async function POST() {
   }
 }
 
+export async function GET() {
+    return POST();
+}
