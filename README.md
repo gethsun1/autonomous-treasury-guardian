@@ -34,15 +34,15 @@ The system consists of three integrated layers: Smart Contracts, the AI Agent La
 
 ```mermaid
 flowchart TD
-    UI[Next.js Frontend\nDashboard / Settings] --> API[Next.js API Routes\n/agent/check-risk\n/agent/propose\n/agent/status]
-    API --> Orchestrator[Orchestrator\nrunAgentCycle()]
-    Orchestrator --> MarketData[Market Data Engine\n(CoinGecko + Volatility)]
-    Orchestrator --> RiskEngine[Risk Engine\n(On-chain params + Balances)]
-    Orchestrator --> ProposalEngine[Proposal Engine\n(Rebalance / Funding / Alerts)]
-    ProposalEngine --> Executor[Agent Wallet Executor\n(Viem + PK)]
-    Executor --> ActionExecutor[Smart Contract: ActionExecutor]
-    RiskEngine --> RiskParameters[Smart Contract: RiskParameters]
-    UI --> TreasuryVault[TreasuryVault\nBalances & Events]
+    UI["Next.js Frontend<br/>Dashboard / Settings"] --> API["Next.js API Routes<br/>/agent/check-risk<br/>/agent/propose<br/>/agent/status"]
+    API --> Orchestrator["Orchestrator<br/>runAgentCycle()"]
+    Orchestrator --> MarketData["Market Data Engine<br/>(CoinGecko + Volatility)"]
+    Orchestrator --> RiskEngine["Risk Engine<br/>(On-chain params + Balances)"]
+    Orchestrator --> ProposalEngine["Proposal Engine<br/>(Rebalance / Funding / Alerts)"]
+    ProposalEngine --> Executor["Agent Wallet Executor<br/>(Viem + PK)"]
+    Executor --> ActionExecutor["Smart Contract: ActionExecutor"]
+    RiskEngine --> RiskParameters["Smart Contract: RiskParameters"]
+    UI --> TreasuryVault["TreasuryVault<br/>Balances & Events"]
     TreasuryVault --> UI
     ActionExecutor --> UI
 ```
