@@ -1,5 +1,7 @@
 # Autonomous Treasury Guardian (ATG)
 
+![Autonomous Treasury Guardian](/public/atg.png)
+
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Network](https://img.shields.io/badge/network-Avalanche%20Fuji-red)
 ![Status](https://img.shields.io/badge/status-Beta-orange)
@@ -9,9 +11,10 @@
 ## 🌟 Core Features
 
 ### 🤖 AI-Driven Autonomy
-- **Risk Engine**: Continuous monitoring of market volatility and vault health.
-- **Automated Proposals**: The AI agent automatically proposes rebalances or payments when risk thresholds are breached.
+- **Risk Engine**: Continuous monitoring of market volatility (via CoinGecko) and vault health.
+- **Automated Proposals**: The AI agent automatically proposes rebalances (AVAX/USDC) when risk thresholds are breached or portfolio allocation drifts.
 - **Agent API**: Integrated Next.js API routes (`/api/agent/*`) for risk evaluation and on-chain action triggering.
+- **Intelligent Execution**: Server-side signer (Viem) automatically submits proposals to the `ActionExecutor` contract.
 
 ### 🛡️ Advanced Governance
 - **Role-Based Access Control**: Granular permissions via `PermissionManager` (Governance, Executor, Agent roles).
@@ -20,7 +23,7 @@
 
 ### 🏛️ Treasury Dashboard
 - **Real-Time Monitoring**: Live feed of treasury balances (AVAX, USDC) and asset allocation.
-- **Activity Feed**: Immutable log of all agent proposals and executed actions.
+- **Activity Feed**: Immutable log of all agent proposals, executed actions, and system telemetry.
 - **Interactive Settings**: UI for managing risk configurations and assigning system roles.
 
 ## 🏗️ System Architecture
@@ -35,8 +38,9 @@ The system consists of three layers:
     *   `AgentAuth`: Authenticates AI agents.
 
 2.  **AI Agent Layer (Next.js API)**:
-    *   **Orchestrator**: Evaluates market conditions against on-chain params.
-    *   **Wallet**: Server-side signer that submits proposals to the blockchain.
+    *   **Orchestrator**: Coordinates the full agent cycle (Market Data -> Risk Engine -> Proposal Engine -> Execution).
+    *   **Risk Engine**: Evaluates on-chain state against risk parameters and market volatility.
+    *   **Wallet**: Server-side signer that submits proposals directly to the blockchain.
 
 3.  **Frontend (Next.js)**:
     *   User interface for human oversight, approval, and configuration.
@@ -118,7 +122,7 @@ In **Settings**, use the **Access Control** panel to:
 ### 4. Testing the Agent
 You can manually trigger the AI risk analysis by hitting the API endpoint:
 ```bash
-curl -X POST http://localhost:3000/api/agent/check-risk
+curl -X POST http://localhost:3000/api/agent/propose
 ```
 If a risk is detected (simulated in `lib/riskEngine.ts`), the agent will automatically propose a remedial action on-chain.
 
