@@ -2,10 +2,9 @@
 
 import Particles from "react-tsparticles";
 import { loadFull } from "tsparticles";
-import type { Engine } from "tsparticles-engine";
 
 export default function ATGParticles() {
-  const init = async (engine: Engine) => {
+  const init = async (engine: any) => {
     await loadFull(engine);
   };
 
