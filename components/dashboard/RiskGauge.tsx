@@ -3,6 +3,7 @@
 import { useRiskParameters } from '@/hooks/blockchain/useRiskParameters'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
+import { RiskIcon, RiskLevel } from '@/components/ui/RiskIcon'
 
 export function RiskGauge() {
   const { parameters } = useRiskParameters()
@@ -11,10 +12,20 @@ export function RiskGauge() {
   const currentRisk = 45 
   const volThreshold = parameters.volatilityThresholdBps ? Number(parameters.volatilityThresholdBps) / 100 : 12
 
+  const getRiskLevel = (risk: number): RiskLevel => {
+    if (risk < 25) return "LOW"
+    if (risk < 50) return "MEDIUM"
+    if (risk < 75) return "HIGH"
+    return "CRITICAL"
+  }
+
+  const riskLevel = getRiskLevel(currentRisk)
+
   return (
-    <Card className="glass-card border-none">
-      <CardHeader>
+    <Card className="glass-card">
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-frost-white">Risk Monitor</CardTitle>
+        <RiskIcon level={riskLevel} className="w-8 h-8" />
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-2">

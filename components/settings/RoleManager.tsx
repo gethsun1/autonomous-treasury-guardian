@@ -25,7 +25,7 @@ export function RoleManager() {
   }
 
   return (
-    <Card className="glass-card border-none max-w-2xl">
+    <Card className="glass-card max-w-2xl">
       <CardHeader>
         <CardTitle className="text-frost-white">Access Control & Permissions</CardTitle>
       </CardHeader>

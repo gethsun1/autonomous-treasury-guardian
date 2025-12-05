@@ -3,14 +3,18 @@
 import { useAiEvents } from '@/hooks/blockchain/useAiEvents'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { RiskIcon } from '@/components/ui/RiskIcon'
 
 export function ActivityFeed() {
   const { events } = useAiEvents()
 
   return (
-    <Card className="glass-card border-none h-full">
-      <CardHeader>
+    <Card className="glass-card h-full">
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-frost-white">AI Decision Log</CardTitle>
+        <div className="flex items-center gap-2" title="System Vigilance Level">
+           <RiskIcon level="LOW" className="w-6 h-6" />
+        </div>
       </CardHeader>
       <CardContent>
         <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">

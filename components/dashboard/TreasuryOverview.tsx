@@ -8,7 +8,7 @@ export function TreasuryOverview() {
   const { balances, isLoading } = useTreasuryBalances()
 
   return (
-    <Card className="glass-card border-none">
+    <Card className="glass-card">
       <CardHeader>
         <CardTitle className="text-frost-white">Treasury Assets</CardTitle>
       </CardHeader>

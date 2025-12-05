@@ -14,13 +14,28 @@
 
 @layer base {
   body {
-    @apply bg-midnight-indigo text-frost-white;
+    background:
+      radial-gradient(circle at 1px 1px, rgba(255,255,255,0.06) 1px, transparent 0),
+      radial-gradient(circle at 1px 1px, rgba(255,255,255,0.04) 1px, transparent 0);
+    background-size: 40px 40px, 80px 80px;
+    background-color: #05070b;
+    @apply text-frost-white font-sans;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display;
+  }
+  button {
+    transition: all 0.25s ease;
+  }
+  button:hover {
+    scale: 1.03;
+    box-shadow: 0 0 20px rgba(0, 233, 255, 0.4);
   }
 }
 
 @layer components {
   .glass-card {
-    @apply bg-glass-gray/60 backdrop-blur-xl border border-white/10 rounded-xl;
+    @apply backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl shadow-xl transition-all duration-300 hover:border-cyan-400/20 hover:shadow-cyan-500/10 hover:-translate-y-1;
   }
   .glass-card-hover {
     @apply hover:border-electric-teal/50 transition-all duration-300;
