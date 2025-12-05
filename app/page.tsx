@@ -35,7 +35,7 @@ export default function Home() {
                     <ArrowRight className="h-4 w-4" />
                   </button>
                 </Link>
-                <Link href="https://github.com/your-repo" target="_blank">
+                <Link href="https://github.com/gethsun1/autonomous-treasury-guardian/tree/main/contracts/core" target="_blank" rel="noopener noreferrer">
                   <button className="btn-secondary w-full sm:w-auto">
                     View Contract
                   </button>
