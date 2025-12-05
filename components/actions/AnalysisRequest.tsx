@@ -6,6 +6,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { useAgentStore } from '@/store/agent-store'
 import { useTreasuryBalances } from '@/hooks/blockchain/useTreasuryBalances'
 import { useRiskParameters } from '@/hooks/blockchain/useRiskParameters'
+import { useExecuteAction } from '@/hooks/blockchain/useExecuteAction'
+import { TOKENS } from '@/lib/tokens'
 import { Loader2, Sparkles } from 'lucide-react'
 import { useChainId, useAccount } from 'wagmi'
 import { contracts } from '@/lib/contracts'
@@ -16,6 +18,7 @@ export function AnalysisRequest() {
   const { lastProposal, isLoading, setLastProposal, setLoading } = useAgentStore()
   const { balances } = useTreasuryBalances()
   const { parameters } = useRiskParameters()
+  const { executeRebalance, isExecuting } = useExecuteAction()
   const chainId = useChainId()
   const { address } = useAccount()
 
@@ -53,6 +56,30 @@ export function AnalysisRequest() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleExecute = () => {
+    if (!lastProposal || !lastProposal.actions.length) return
+    
+    const action = lastProposal.actions[0]
+    if (action.type !== 'REBALANCE') return
+
+    const tokenList = TOKENS[chainId as keyof typeof TOKENS] || []
+    const tokenFrom = tokenList.find(t => t.symbol === action.tokenFrom)?.address
+    const tokenTo = tokenList.find(t => t.symbol === action.tokenTo)?.address
+
+    if (!tokenFrom || !tokenTo) {
+      console.error('Token not found for chain', chainId)
+      return
+    }
+
+    executeRebalance(
+      tokenFrom,
+      tokenTo,
+      BigInt(action.amount),
+      "0x", // Mock swap data
+      lastProposal.proposalId
+    )
   }
 
   return (
@@ -107,8 +134,19 @@ export function AnalysisRequest() {
 
                 <div className="flex justify-end gap-4 pt-4">
                    <Button variant="outline" onClick={() => setIsOpen(false)}>Close</Button>
-                   <Button className="bg-success-green hover:bg-success-green/80 text-midnight-indigo font-bold">
-                     Proceed to Execution
+                   <Button 
+                     onClick={handleExecute}
+                     disabled={isExecuting}
+                     className="bg-success-green hover:bg-success-green/80 text-midnight-indigo font-bold"
+                   >
+                     {isExecuting ? (
+                       <>
+                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                         Executing...
+                       </>
+                     ) : (
+                       "Proceed to Execution"
+                     )}
                    </Button>
                 </div>
               </div>

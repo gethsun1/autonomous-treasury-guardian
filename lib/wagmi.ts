@@ -1,4 +1,4 @@
-import { cookieStorage, createStorage } from 'wagmi'
+import { cookieStorage, createStorage, http } from 'wagmi'
 import { avalanche, avalancheFuji } from 'wagmi/chains'
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
 
@@ -12,7 +12,11 @@ export const wagmiAdapter = new WagmiAdapter({
   }),
   ssr: true,
   projectId,
-  networks
+  networks,
+  transports: {
+    [avalanche.id]: http('https://api.avax.network/ext/bc/C/rpc'),
+    [avalancheFuji.id]: http('https://api.avax-test.network/ext/bc/C/rpc')
+  }
 })
 
 export const config = wagmiAdapter.wagmiConfig
