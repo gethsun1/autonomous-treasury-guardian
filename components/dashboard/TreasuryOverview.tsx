@@ -3,9 +3,30 @@
 import { useTreasuryBalances } from '@/hooks/blockchain/useTreasuryBalances'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useEffect, useState } from 'react'
 
 export function TreasuryOverview() {
   const { balances, isLoading } = useTreasuryBalances()
+  const [prices, setPrices] = useState<Record<string, number>>({})
+
+  useEffect(() => {
+    async function fetchPrices() {
+        try {
+            // Fetch AVAX and USDC prices
+            const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=avalanche-2,usd-coin&vs_currencies=usd')
+            const data = await res.json()
+            setPrices({
+                'WAVAX': data['avalanche-2'].usd,
+                'USDC': data['usd-coin'].usd
+            })
+        } catch (e) {
+            console.error("Failed to fetch prices", e)
+        }
+    }
+    fetchPrices()
+    const interval = setInterval(fetchPrices, 60000)
+    return () => clearInterval(interval)
+  }, [])
 
   return (
     <Card className="glass-card">
@@ -34,7 +55,9 @@ export function TreasuryOverview() {
                 <div className="text-right">
                   <p className="font-bold text-frost-white">{parseFloat(token.balance).toLocaleString()}</p>
                   <p className="text-xs text-frost-white/60">
-                    {token.symbol === 'USDC' ? '$1.00' : 'Price N/A'}
+                    {prices[token.symbol] 
+                        ? `$${prices[token.symbol].toLocaleString()}` 
+                        : (token.symbol === 'USDC' ? '$1.00' : 'Price N/A')}
                   </p>
                 </div>
               </div>
@@ -50,4 +73,3 @@ export function TreasuryOverview() {
     </Card>
   )
 }
-

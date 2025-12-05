@@ -11,9 +11,11 @@
 
 ### 🤖 AI-Driven Autonomy
 - **Risk Engine**: Continuous, real-time monitoring of market volatility (via CoinGecko) and vault health.
+- **Narrative Reasoning**: Integrated LLM (Mistral/Zephyr-7B via HuggingFace) generates human-readable explanations for every risk assessment and proposal.
 - **Automated Proposals**: The AI agent proactively proposes rebalances (e.g., AVAX/USDC swaps) when risk thresholds are breached or portfolio allocation drifts.
 - **Agent API**: Dedicated Next.js API routes (`/api/agent/*`) for on-demand risk evaluation and on-chain action triggering.
 - **Intelligent Execution**: Secure server-side signer (Viem) automatically submits proposals to the `ActionExecutor` contract.
+- **Autonomous Scheduling**: Vercel Cron integration ensures the agent runs checks every 10 minutes without manual triggers.
 
 ### 🛡️ Advanced Governance
 - **Role-Based Access Control**: Granular permissions via `PermissionManager` (Governance, Executor, Agent roles).
@@ -21,8 +23,9 @@
 - **Guardian Controls**: Emergency system pause/unpause and instant role revocation capabilities.
 
 ### 🏛️ Treasury Dashboard
-- **Real-Time Monitoring**: Live visualization of treasury balances (AVAX, USDC) and asset allocation.
-- **Activity Feed**: Immutable, transparent log of all agent proposals, executed actions, and system telemetry.
+- **Real-Time Monitoring**: Live visualization of treasury balances (AVAX, USDC) fetched from on-chain and priced via CoinGecko.
+- **Live Risk Gauge**: Dynamic risk scoring based on real-time market volatility and on-chain parameters.
+- **Activity Feed**: Immutable, transparent log of all agent proposals, executed actions, and AI narratives/telemetry.
 - **Interactive Settings**: Intuitive UI for managing risk configurations and assigning system roles.
 
 ## 🏗️ System Architecture
@@ -37,6 +40,7 @@ flowchart TD
     API --> Orchestrator["Orchestrator<br/>runAgentCycle()"]
     Orchestrator --> MarketData["Market Data Engine<br/>(CoinGecko + Volatility)"]
     Orchestrator --> RiskEngine["Risk Engine<br/>(On-chain params + Balances)"]
+    Orchestrator --> LLM["LLM Engine<br/>(HuggingFace Inference)"]
     Orchestrator --> ProposalEngine["Proposal Engine<br/>(Rebalance / Funding / Alerts)"]
     ProposalEngine --> Executor["Agent Wallet Executor<br/>(Viem + PK)"]
     Executor --> ActionExecutor["Smart Contract: ActionExecutor"]
@@ -50,47 +54,26 @@ flowchart TD
 
 ```mermaid
 sequenceDiagram
-    participant User as User (Dashboard)
-    participant UI as Frontend (Next.js)
+    participant User as User / Cron
     participant API as API Routes
     participant Agent as ATG Orchestrator
-    participant Market as Market Data Engine
+    participant Market as Market Data
     participant Risk as Risk Engine
-    participant Proposal as Proposal Engine
+    participant LLM as HuggingFace LLM
     participant Exec as Agent Executor
-    participant Chain as Avalanche Smart Contracts
+    participant Chain as Avalanche Contracts
 
-    User->>UI: Clicks "Run AI Analysis"
-    UI->>API: POST /agent/propose
+    User->>API: POST /agent/propose (Cron or Manual)
     API->>Agent: runAgentCycle()
     Agent->>Market: Fetch live prices & volatility
-    Market-->>Agent: PriceFeed + Volatility
     Agent->>Risk: Evaluate balances + on-chain params
-    Risk-->>Agent: RiskScore (Low/Med/High/Critical)
-    Agent->>Proposal: Generate action proposal
-    Proposal-->>Agent: Proposal Struct
-    Agent->>Exec: Submit proposal transaction
+    Risk-->>Agent: Risk Analysis (Score, Breaches)
+    Agent->>LLM: Generate Narrative Explanation
+    LLM-->>Agent: "Risk is elevated due to..."
+    Agent->>Exec: Submit proposal transaction (if needed)
     Exec->>Chain: executeAction()
     Chain-->>API: Tx Receipt + Events
-    API-->>UI: Updated Status + Logs
 ```
-
-### Component Breakdown
-
-1.  **Smart Contracts (Avalanche)**:
-    *   `TreasuryVault`: Securely holds assets and enforces withdrawal logic.
-    *   `ActionExecutor`: The gateway for executing authorized actions (swaps, payments).
-    *   `RiskParameters`: Stores on-chain risk rules and thresholds.
-    *   `PermissionManager`: Manages access control and role assignments.
-    *   `AgentAuth`: Authenticates AI agents for on-chain interaction.
-
-2.  **AI Agent Layer (Next.js API)**:
-    *   **Orchestrator**: Coordinates the full agent cycle (Market Data -> Risk Engine -> Proposal Engine -> Execution).
-    *   **Risk Engine**: Evaluates on-chain state against risk parameters and market volatility.
-    *   **Wallet**: Server-side signer that submits proposals directly to the blockchain.
-
-3.  **Frontend (Next.js)**:
-    *   A modern user interface for human oversight, approval, configuration, and monitoring.
 
 ## 🚀 Deployed Contracts (Avalanche Fuji)
 
@@ -139,7 +122,8 @@ sequenceDiagram
     
     # Agent Configuration (Backend)
     AGENT_PRIVATE_KEY=0x... # Private key for the server-side agent wallet
-    
+    HF_ACCESS_TOKEN=hf_... # Hugging Face Token for LLM narratives
+
     # Reown / WalletConnect
     NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your_project_id
     ```
@@ -152,7 +136,7 @@ sequenceDiagram
 ## 🧪 Usage Guide
 
 ### 1. Dashboard
-Visit the main dashboard to see the current "Runway Status", "Risk Gauge", and "Activity Feed". The activity feed updates in real-time via contract event listeners.
+Visit the main dashboard to see the current "Runway Status", "Risk Gauge", and "Activity Feed". The activity feed updates in real-time via contract event listeners and server-side agent logs.
 
 ### 2. Risk Configuration
 Navigate to **Settings**. Here you can:
@@ -171,7 +155,7 @@ You can manually trigger the AI risk analysis by hitting the API endpoint:
 ```bash
 curl -X POST http://localhost:3000/api/agent/propose
 ```
-If a risk is detected (simulated in `lib/riskEngine.ts`), the agent will automatically propose a remedial action on-chain.
+If a risk is detected, the agent will generate a narrative explanation and propose a remedial action on-chain.
 
 ## 🔒 Security
 

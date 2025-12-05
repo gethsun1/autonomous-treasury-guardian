@@ -6,7 +6,7 @@ const ACTIVITY_FILE = path.join(process.cwd(), 'store', 'activity.json');
 
 export interface ActivityLog {
   timestamp: number;
-  type: 'INFO' | 'WARNING' | 'ERROR' | 'ACTION' | 'PROPOSAL';
+  type: 'INFO' | 'WARNING' | 'ERROR' | 'ACTION' | 'PROPOSAL' | 'NARRATIVE';
   message: string;
   details?: Record<string, any>;
 }
