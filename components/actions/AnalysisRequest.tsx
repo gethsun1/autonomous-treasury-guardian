@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { useAgentStore } from '@/store/agent-store'
@@ -15,6 +15,7 @@ import { contracts } from '@/lib/contracts'
 
 export function AnalysisRequest() {
   const [isOpen, setIsOpen] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const { lastProposal, isLoading, setLastProposal, setLoading } = useAgentStore()
   const { balances } = useTreasuryBalances()
   const { parameters } = useRiskParameters()
@@ -22,9 +23,18 @@ export function AnalysisRequest() {
   const chainId = useChainId()
   const { address } = useAccount()
 
+  const tokenList = useMemo(() => TOKENS[chainId as keyof typeof TOKENS] || [], [chainId])
+
+  const symbolForAddress = (addr: string | undefined) => {
+    if (!addr) return ''
+    const token = tokenList.find(t => t.address.toLowerCase() === addr.toLowerCase())
+    return token?.symbol || addr
+  }
+
   const handleAnalyze = async () => {
     setLoading(true)
     setIsOpen(true) 
+    setError(null)
     try {
       const snapshot = {
         chainId,
@@ -36,23 +46,46 @@ export function AnalysisRequest() {
       
       console.log('Analyzing snapshot:', snapshot)
 
-      // Mock response if backend not available for demo
-      // const result = await fetchAgentAnalysis(snapshot)
-      
-      // Simulated delay + mock result
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      const result = {
-        proposalId: '0x' + Math.random().toString(16).slice(2),
-        reasoning: "Volatility in AVAX suggests a rebalance to USDC is prudent to maintain risk parity. Current exposure exceeds 15% threshold.",
-        confidence: 0.92,
+      const response = await fetch('/api/agent/propose', {
+        method: 'POST'
+      })
+
+      if (!response.ok) {
+        throw new Error(`Agent responded with ${response.status}`)
+      }
+
+      const data = await response.json()
+
+      if (data.status === 'NO_ACTION' || !data.proposal) {
+        setLastProposal(null)
+        setError(data.error || 'Agent returned no actionable proposal')
+        return
+      }
+
+      const proposal = data.proposal
+      const reasoning = data.narrative || proposal.reason || 'No reasoning provided'
+
+      const confidence = data.execution?.success ? 0.9 : 0.7
+
+      const mappedProposal = {
+        proposalId: data.execution?.actionId || proposal.reason || `proposal-${Date.now()}`,
+        reasoning,
+        confidence,
         actions: [
-          { type: 'REBALANCE', tokenFrom: 'WAVAX', tokenTo: 'USDC', amount: '1000000000000000000' }
+          {
+            type: proposal.actionType,
+            tokenFrom: symbolForAddress(proposal.tokenFrom),
+            tokenTo: symbolForAddress(proposal.tokenTo),
+            amount: proposal.amount
+          }
         ]
       }
-      
-      setLastProposal(result)
+
+      setLastProposal(mappedProposal)
     } catch (error) {
       console.error(error)
+      setError((error as Error).message || 'Failed to get analysis')
+      setLastProposal(null)
     } finally {
       setLoading(false)
     }
@@ -64,7 +97,6 @@ export function AnalysisRequest() {
     const action = lastProposal.actions[0]
     if (action.type !== 'REBALANCE') return
 
-    const tokenList = TOKENS[chainId as keyof typeof TOKENS] || []
     const tokenFrom = tokenList.find(t => t.symbol === action.tokenFrom)?.address
     const tokenTo = tokenList.find(t => t.symbol === action.tokenTo)?.address
 
@@ -103,6 +135,10 @@ export function AnalysisRequest() {
               <div className="flex flex-col items-center justify-center py-12 space-y-4">
                 <Loader2 className="h-12 w-12 animate-spin text-electric-teal" />
                 <p className="text-sm text-frost-white/70">Analyzing on-chain data & market feeds...</p>
+              </div>
+            ) : error ? (
+              <div className="text-center text-red-400 py-8 text-sm">
+                {error}
               </div>
             ) : lastProposal ? (
               <div className="space-y-6">
