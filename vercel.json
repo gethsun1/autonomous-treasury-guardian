@@ -1,8 +1,2 @@
 {
-  "crons": [
-    {
-      "path": "/api/agent/propose",
-      "schedule": "0 12 * * *"
-    }
-  ]
 }
