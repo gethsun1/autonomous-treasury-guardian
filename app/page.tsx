@@ -89,9 +89,7 @@ export default function Home() {
                       transition={{ duration: 0.5 }}
                       className="text-lg text-frost-white/70 md:text-xl/relaxed font-mono"
                     >
-                      <span className="mr-2 text-electric-teal">{">"}</span>
                       {sentences[index]}
-                      <span className="animate-pulse ml-1 text-electric-teal">_</span>
                     </motion.p>
                   </AnimatePresence>
                 </div>
