@@ -23,6 +23,7 @@ export interface RiskAnalysis {
 interface MarketContext {
   AVAX: { price: number; volatility: number };
   USDC: { price: number };
+  timestamp?: number;
 }
 
 // Estimated monthly burn in USD (for runway calculation)
