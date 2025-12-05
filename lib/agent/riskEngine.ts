@@ -94,14 +94,18 @@ export async function evaluateRisk(marketData: MarketContext): Promise<RiskAnaly
         
         // If strictly below, we might need to TOP_UP, but usually rebalancing doesn't fix runway unless we swap to stable?
         // For now, if runway is low, we might suggest TOP_UP.
-        action = 'TOP_UP';
+        if (action === 'DO_NOTHING') {
+          action = 'TOP_UP';
+        }
     }
 
     // Legacy check for very low balance
     if (totalValue < 100) {
         breachReasons.push(`Treasury value critical (< $100)`);
         if (riskLevel !== 'CRITICAL') riskLevel = 'HIGH';
-        action = 'TOP_UP';
+        if (action === 'DO_NOTHING') {
+          action = 'TOP_UP';
+        }
     }
 
     // 4. Compile Analysis
