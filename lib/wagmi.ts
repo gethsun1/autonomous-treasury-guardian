@@ -12,12 +12,13 @@ export const wagmiAdapter = new WagmiAdapter({
   }),
   ssr: true,
   projectId,
-  networks,
-  transports: {
-    [avalanche.id]: http('https://api.avax.network/ext/bc/C/rpc'),
-    [avalancheFuji.id]: http('https://api.avax-test.network/ext/bc/C/rpc')
-  }
+  networks
 })
 
 export const config = wagmiAdapter.wagmiConfig
+
+// Force override transports after config creation to ensure they are respected
+config.transports[avalanche.id] = http('https://api.avax.network/ext/bc/C/rpc')({ chain: avalanche })
+config.transports[avalancheFuji.id] = http('https://api.avax-test.network/ext/bc/C/rpc')({ chain: avalancheFuji })
+
 
