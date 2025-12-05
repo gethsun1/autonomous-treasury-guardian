@@ -41,8 +41,8 @@ export async function generateProposal(risk: RiskAnalysis): Promise<ActionPropos
     let reason = '';
 
     const isVolHigh = risk.breachReasons.some(r => r.includes('Volatility'));
-    const isAvaxHigh = risk.metrics.avaxExposurePct > 60;
-    const isAvaxLow = risk.metrics.avaxExposurePct < 40;
+    const isAvaxHigh = risk.metrics.avaxExposurePct > 70;
+    const isAvaxLow = risk.metrics.avaxExposurePct < 30;
 
     if (isVolHigh || isAvaxHigh) {
         // Sell AVAX for USDC
