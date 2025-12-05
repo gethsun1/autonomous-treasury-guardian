@@ -30,6 +30,17 @@ export async function generateProposal(risk: RiskAnalysis): Promise<ActionPropos
         publicClient.readContract({ address: contracts.treasuryVault.address, abi: contracts.treasuryVault.abi, functionName: 'balanceOf', args: [usdcToken.address as `0x${string}`] })
     ]) as [bigint, bigint];
 
+    await logActivity('INFO', 'Proposal inputs', {
+      avaxBal: avaxBal.toString(),
+      usdcBal: usdcBal.toString(),
+      avaxExposurePct: risk.metrics.avaxExposurePct,
+      stableExposurePct: risk.metrics.stablecoinExposurePct,
+      volatilityScorePct: risk.metrics.volatilityScore,
+      volatilityThresholdPct: risk.metrics.volatilityThresholdPct,
+      maxRebalancePct: risk.metrics.maxRebalancePct,
+      breachReasons: risk.breachReasons
+    });
+
     // 2. Determine Direction
     // If Volatility is reason -> Reduce Risk (Sell AVAX)
     // If Exposure High -> Sell AVAX

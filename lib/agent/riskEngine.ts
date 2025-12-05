@@ -33,6 +33,18 @@ export async function evaluateRisk(marketData: MarketContext): Promise<RiskAnaly
     // 1. Read On-Chain State (Risk Params + Balances)
     const { riskParams, balances } = await getOnChainState();
 
+    await logActivity('INFO', 'Risk inputs loaded', {
+      avaxBalance: balances.avaxAmt,
+      usdcBalance: balances.usdcAmt,
+      maxRebalanceBps: Number(riskParams.maxRebalanceBps),
+      volThresholdBps: Number(riskParams.volatilityThresholdBps),
+      minRunwayMonths: Number(riskParams.minRunwayMonths),
+      avaxPrice: marketData.AVAX.price,
+      usdcPrice: marketData.USDC.price,
+      avaxVolatilityBps: marketData.AVAX.volatility,
+      timestamp: marketData.timestamp
+    });
+
     // 2. Calculate Portfolio Metrics
     // avaxAmt and usdcAmt are already parsed numbers from getOnChainState
     const avaxValue = balances.avaxAmt * marketData.AVAX.price;
@@ -111,7 +123,10 @@ export async function evaluateRisk(marketData: MarketContext): Promise<RiskAnaly
     await logActivity('INFO', `Risk evaluated: ${riskLevel}`, { 
         action, 
         exposure: `${avaxExposure.toFixed(1)}% AVAX`,
-        runway: `${runwayMonths.toFixed(1)}m`
+        runway: `${runwayMonths.toFixed(1)}m`,
+        volatilityScorePct: currentVolPct,
+        volatilityThresholdPct: volThresholdPct,
+        breachReasons
     });
 
     return analysis;

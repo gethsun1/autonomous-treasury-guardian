@@ -47,6 +47,21 @@ export async function runAgentCycle(): Promise<AgentResult> {
     
     // 2. Risk Analysis
     const riskAnalysis = await evaluateRisk(marketData);
+    await logActivity('INFO', 'Risk analysis result', {
+      status: riskAnalysis.riskLevel,
+      recommendedAction: riskAnalysis.recommendedAction,
+      breachReasons: riskAnalysis.breachReasons,
+      exposurePct: {
+        avax: riskAnalysis.metrics.avaxExposurePct,
+        stable: riskAnalysis.metrics.stablecoinExposurePct
+      },
+      volatility: {
+        scorePct: riskAnalysis.metrics.volatilityScore,
+        thresholdPct: riskAnalysis.metrics.volatilityThresholdPct
+      },
+      runwayMonths: riskAnalysis.metrics.estimatedRunwayMonths,
+      totalValueUsd: riskAnalysis.metrics.totalValueUsd
+    });
     
     if (riskAnalysis.riskLevel === 'LOW' && riskAnalysis.recommendedAction === 'DO_NOTHING') {
         await logActivity('INFO', 'Risk level LOW. No action needed.');
@@ -57,6 +72,10 @@ export async function runAgentCycle(): Promise<AgentResult> {
     // 3. Proposal Generation
     // Even if risk is MEDIUM, we might want to rebalance if it helps
     const proposal = await generateProposal(riskAnalysis);
+    await logActivity('INFO', 'Proposal generation output', {
+      hasProposal: !!proposal,
+      proposal
+    });
 
     // 4. Narrative Generation
     const narrative = await generateNarrative({
