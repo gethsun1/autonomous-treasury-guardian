@@ -39,9 +39,11 @@ export default function Home() {
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-electric-teal/10 via-midnight-indigo/50 to-midnight-indigo -z-10" />
           
           {/* Center Back Shield (Parallax/Background) */}
-          <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none -z-10 scale-[2] blur-sm">
+          <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none -z-10 scale-[2] blur-[2px]">
             <ATGShield className="w-96 h-96" />
           </div>
+
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(0,229,255,0.1)_0%,_rgba(139,92,246,0.05)_40%,_transparent_70%)] pointer-events-none -z-10" />
 
           <div className="container px-4 md:px-6 relative z-10">
             <div className="flex flex-col items-center text-center space-y-10">
