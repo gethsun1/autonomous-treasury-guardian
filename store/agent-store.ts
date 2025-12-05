@@ -11,7 +11,7 @@ export interface AgentProposal {
 interface AgentState {
   lastProposal: AgentProposal | null;
   isLoading: boolean;
-  setLastProposal: (proposal: AgentProposal) => void;
+  setLastProposal: (proposal: AgentProposal | null) => void;
   setLoading: (loading: boolean) => void;
 }
 
